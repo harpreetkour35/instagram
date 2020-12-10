@@ -1,23 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import Post from "./Post";
+import { db } from "./firebase";
 
 function App() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    db.collection("posts").onSnapshot((snapshot) => {
+      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() })));
+    });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="app__header">
+        <img
+          className="app__headerImage"
+          src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
+          alt=""
+        />
+      </div>
+      {posts.map(({ id, data }) => (
+        <Post
+          key={id}
+          username={data.username}
+          caption={data.caption}
+          imageUrl={data.imageUrl}
+        />
+      ))}
     </div>
   );
 }
